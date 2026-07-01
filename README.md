@@ -1,160 +1,238 @@
 # HDI-Predictor
 
-A machine learning project for predicting the Human Development Index (HDI) from socioeconomic and demographic data.
+**AI-Powered Human Development Index Prediction Dashboard**
 
-## Project Structure
+HDI-Predictor is a premium dashboard application that combines machine learning and modern web UI to estimate Human Development Index scores from development indicators.
 
-- `backend/` - API server, model training, inference scripts, and data processing utilities.
-- `frontend/` - Web application or dashboard for interacting with the model and visualizing predictions.
-- `dataset/` - Raw and processed data files used for training and evaluation.
-- `models/` - Saved trained model artifacts, checkpoints, and versioned model files.
-- `reports/` - Analysis reports, evaluation summaries, and documentation of experiments.
-- `screenshots/` - UI screenshots, results snapshots, and visual examples of the application.
+---
 
-## 1. Getting Started
+## Project Overview
 
-### Prerequisites
+This project provides:
 
-- Python 3.10+ (or as required by the backend implementation)
-- Node.js 18+ and npm/yarn (if `frontend/` is a web app)
-- Git (optional)
+- A **Flask backend** for HDI prediction and validation
+- A **React + Vite + Tailwind frontend** for interactive analytics
+- A trained **Gradient Boosting Regressor** model
+- A polished dashboard with prediction history, insights, gauge charts, and export options
 
-### Recommended Setup
+The goal is to create a professional portfolio-ready product, not only an internship project.
 
-1. Open a terminal in `HDI-Predictor`.
-2. Create a Python virtual environment:
+---
+
+## Features
+
+- **Live HDI prediction** using user-provided indicators
+- **Robust backend validation** for all inputs
+- **Model metadata** returned with each prediction
+- **Premium dashboard UI** with dark theme and analytics cards
+- **Gauge chart** with centered HDI score and category
+- **Dynamic AI insights** based on predicted HDI category
+- **Prediction history** saved locally
+- **Export options** for CSV and PDF
+
+---
+
+## Repository Structure
+
+```
+HDI-Predictor/
+├── backend/
+├── frontend/
+├── dataset/
+├── models/
+├── reports/
+├── screenshots/
+├── README.md
+├── requirements.txt
+├── LICENSE
+└── .gitignore
+```
+
+---
+
+## Architecture
+
+### Current Local Architecture
+
+```
+User
+  │
+  ▼
+React Dashboard
+  │
+  ▼
+Axios API
+  │
+  ▼
+Flask Backend
+  │
+  ▼
+Validation Layer
+  │
+  ▼
+Gradient Boosting Model
+  │
+  ▼
+Prediction Response
+  │
+  ▼
+Dashboard + Charts
+```
+
+### Deployment Architecture (Future)
+
+```
+User
+  │
+  ▼
+React (Vercel)
+  │
+  ▼
+AWS EC2 (Nginx + Gunicorn)
+  │
+  ▼
+Flask Backend
+  │
+  ▼
+Gradient Boosting Model
+```
+
+---
+
+## ML Pipeline
+
+1. **Dataset loading** from the `dataset/` folder
+2. **Data cleaning** and preprocessing with backend scripts
+3. **Feature selection** using development indicators
+4. **Model training** with Gradient Boosting Regressor
+5. **Model evaluation** using R² and error metrics
+6. **Model serialization** to `models/hdi_model.pkl`
+7. **API inference** via `backend/app.py`
+
+---
+
+## Installation
+
+### Backend
 
 ```bash
+cd d:\projects\HDI-Predictor
 python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
 ```
 
-3. Activate the environment:
-
-- Windows PowerShell:
-  ```powershell
-  .\.venv\Scripts\Activate.ps1
-  ```
-- Windows CMD:
-  ```cmd
-  .\.venv\Scripts\activate.bat
-  ```
-
-4. Install backend dependencies after they are defined in `backend/requirements.txt`.
-
-```bash
-pip install -r backend/requirements.txt
-```
-
-## 2. Backend
-
-The `backend/` folder contains the logic for:
-
-- loading and preprocessing data
-- training HDI prediction models
-- saving trained model artifacts
-- serving predictions through an API
-
-### Typical Backend Workflow
-
-1. Place raw datasets in `dataset/raw/`.
-2. Run preprocessing and feature engineering.
-3. Train the model and save artifacts to `models/`.
-4. Start the API server for inference.
-
-### Example Commands
-
-```bash
-cd backend
-python preprocess.py
-python train.py
-python serve.py
-```
-
-> Note: Exact script names may vary depending on implementation.
-
-## 3. Frontend
-
-The `frontend/` folder contains the application for users to interact with the prediction service.
-
-### Typical Frontend Workflow
-
-1. Install dependencies:
+### Frontend
 
 ```bash
 cd frontend
 npm install
 ```
 
-2. Start the frontend development server:
+---
+
+## Running the Project
+
+### Start Backend
 
 ```bash
-npm start
+cd backend
+..\.venv\Scripts\python.exe app.py
 ```
+
+### Start Frontend
+
+```bash
+cd frontend
+npm run dev
 ```
 
-3. Open the browser at the displayed local URL.
+Open the frontend at `http://127.0.0.1:5173`.
 
-## 4. Dataset
+---
 
-The `dataset/` folder should contain:
+## API
 
-- raw data files used for training and validation
-- cleaned datasets generated during preprocessing
-- metadata or data dictionaries
+### `GET /`
 
-Example layout:
+Returns basic backend health status.
 
-- `dataset/raw/`
-- `dataset/processed/`
+### `POST /predict`
 
-## 5. Models
+Predict HDI using JSON input:
 
-The `models/` folder stores:
+```json
+{
+  "Life_Expectancy": 82.5,
+  "Expected_Schooling": 18,
+  "Mean_Schooling": 13,
+  "GNI": 60000
+}
+```
 
-- trained model weights
-- serialized model files (`.pkl`, `.joblib`, `.h5`, etc.)
-- model version metadata
+### Response Example
 
-Use this folder to track and reuse model artifacts.
+```json
+{
+  "Predicted_HDI": 0.956,
+  "Category": "Very High",
+  "Confidence": "98.56%",
+  "Model": "Gradient Boosting Regressor",
+  "Prediction_Time": "0.00"
+}
+```
 
-## 6. Reports
+### Validation
 
-The `reports/` folder is for:
+The API validates:
 
-- experiment summaries
-- evaluation metrics
-- charts and tables
-- project documentation and research notes
+- required fields
+- numeric values
+- positive ranges
+- clear error messages for invalid input
 
-## 7. Screenshots
+---
 
-The `screenshots/` folder is for capturing:
+## Results
 
-- UI screens from the frontend
-- visual result examples
-- model performance plots
+- **Model:** Gradient Boosting Regressor
+- **Validation R²:** 0.9856
+- **Predicted HDI example:** 0.956
+- **Confidence:** 98.56%
 
-## 8. Running the Project
+---
 
-1. Prepare the dataset and place it into `dataset/raw/`.
-2. Run backend preprocessing and training.
-3. Launch the backend inference server.
-4. Start the frontend client and use it to submit prediction requests.
+## Screenshots
 
-## 9. Suggested Project Enhancements
+Screenshots are stored in the `screenshots/` folder and should include:
 
-- Add `backend/requirements.txt` for Python dependencies.
-- Add `frontend/package.json` for frontend package management.
-- Add example data files or a sample dataset.
-- Add model training and evaluation scripts.
-- Add documentation for the API endpoints.
+- Home screen
+- Prediction section
+- AI Insights section
+- Gauge view
+- Prediction history
+- Export panel
 
-## 10. Notes
+---
 
-This README is a starting point. As project code is added, update this file with:
+## Future Scope
 
-- exact installation commands
-- real script names
-- API usage examples
-- frontend screenshots and navigation tips
-- dataset schema and feature descriptions
+- Deploy the frontend on **Vercel** and backend on **AWS EC2**
+- Add **country comparison** and **trend analytics**
+- Add **interactive choropleth map** for global HDI
+- Add **historical HDI trends** if time series data is available
+- Add **recommendations** based on AI insights
+- Add **authentication** and user-specific prediction history
+
+---
+
+## Team
+
+- DVL Raghava
+- D. Niharika Tejaswi
+
+---
+
+## Notes
+
+This README is designed for a polished, production-ready project. Update it with actual screenshots, exact deployment URLs, and any additional dataset or model details as the project evolves.

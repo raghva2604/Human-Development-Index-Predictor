@@ -1,31 +1,58 @@
 from flask import Flask, request, jsonify
-import pickle
+from flask_cors import CORS
+from predict import predict_hdi
 
 app = Flask(__name__)
+CORS(app)
 
-MODEL_PATH = "../models/hdi_model.pkl"
+REQUIRED_FIELDS = [
+    "Life_Expectancy",
+    "Expected_Schooling",
+    "Mean_Schooling",
+    "GNI",
+]
 
-@app.route("/health", methods=["GET"])
-def health_check():
-    return jsonify({"status": "ok"})
+@app.route("/")
+def home():
+    return jsonify({
+        "Project": "HDI Predictor",
+        "Status": "Running"
+    })
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.json
+    data = request.get_json(silent=True)
     if not data:
-        return jsonify({"error": "Invalid input"}), 400
+        return jsonify({"error": "Request body must be valid JSON."}), 400
+
+    missing = [field for field in REQUIRED_FIELDS if field not in data]
+    if missing:
+        return jsonify({"error": f"Missing required fields: {', '.join(missing)}."}), 400
 
     try:
-        with open(MODEL_PATH, "rb") as f:
-            model = pickle.load(f)
+        life_expectancy = float(data["Life_Expectancy"])
+        expected_schooling = float(data["Expected_Schooling"])
+        mean_schooling = float(data["Mean_Schooling"])
+        gni = float(data["GNI"])
+    except (ValueError, TypeError):
+        return jsonify({"error": "All fields must be numeric values."}), 400
 
-        features = data.get("features")
-        prediction = model.predict([features])
-        return jsonify({"prediction": prediction[0]})
-    except FileNotFoundError:
-        return jsonify({"error": "Model file not found"}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    if life_expectancy <= 0:
+        return jsonify({"error": "Life Expectancy must be a positive number."}), 400
+    if expected_schooling < 0:
+        return jsonify({"error": "Expected Schooling cannot be negative."}), 400
+    if mean_schooling < 0:
+        return jsonify({"error": "Mean Schooling cannot be negative."}), 400
+    if gni <= 0:
+        return jsonify({"error": "GNI must be a positive number."}), 400
+
+    result = predict_hdi(
+        life_expectancy,
+        expected_schooling,
+        mean_schooling,
+        gni,
+    )
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
